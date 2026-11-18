@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Программы для Windows, боты и вертикальные ролики из кода: интерфейсы, фишки, видео и хронология работы.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Работы HumsteRD">
+<meta property="og:description" content="Программы для Windows, боты и вертикальные ролики из кода: интерфейсы, фишки, видео и хронология работы.">
+<meta property="og:image" content="https://humsterd.github.io/media/cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312151C'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-weight='700' font-size='38' text-anchor='middle' fill='%23ECEEF3'%3EH%3C/text%3E%3C/svg%3E">
+<title>Работы HumsteRD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: витрина. Сводка, плитки продуктов, листы продуктов со снимками окон, лента роликов 9:16, затем хронология и цифры; колонка до 1160px */
+:root {
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --sunk: #ECEEF2;
+  --ink: #12151C;
+  --ink-2: #465063;
+  --muted: #6B7383;
+  --line: #D6DAE2;
+  --hair: #E6E9EE;
+  --frame: #0C0D11;
+  --frame-line: #23262E;
+  --lb-bg: rgba(8, 9, 12, .94);
+  --lb-ink: #ECEEF3;
+  --lb-mut: #A9B0BD;
+  --c-app: #2a78d6;
+  --c-bot: #eb6834;
+  --c-video: #1baf7a;
+  --c-infra: #eda100;
+  --c-other: #AEB4BF;
+  --good: #0ca30c;
+  --wip: #e39a00;
+  --done: #8A92A1;
+  --f-display: "Geologica", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1015; --surface: #161920; --sunk: #1D212A; --ink: #ECEEF3; --ink-2: #B3BAC7; --muted: #868E9D;
+    --line: #2B303B; --hair: #22262F; --frame: #0A0B0E; --frame-line: #2B303B;
+    --c-app: #3987e5; --c-bot: #d95926; --c-video: #199e70; --c-infra: #c98500; --c-other: #545B68;
+    --good: #2fbf2f; --wip: #f0ad1c; --done: #6E7686;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1015; --surface: #161920; --sunk: #1D212A; --ink: #ECEEF3; --ink-2: #B3BAC7; --muted: #868E9D;
+  --line: #2B303B; --hair: #22262F; --frame: #0A0B0E; --frame-line: #2B303B;
+  --c-app: #3987e5; --c-bot: #d95926; --c-video: #199e70; --c-infra: #c98500; --c-other: #545B68;
+  --good: #2fbf2f; --wip: #f0ad1c; --done: #6E7686;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 22px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 76px;
+}
+h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--c-app); outline-offset: 2px; border-radius: 6px; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; flex: none; background: var(--c, var(--muted)); }
+
+/* ---------- Верх ---------- */
+.lead { display: flex; flex-direction: column; gap: 44px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 8px 20px; flex-wrap: wrap; }
+.brand { font: 600 17px var(--f-display); letter-spacing: -0.01em; text-decoration: none; }
+.top nav { display: flex; gap: 2px 20px; flex-wrap: wrap; font-size: 14.5px; }
+.top nav a { color: var(--ink-2); text-decoration: none; padding: 4px 0; }
+.top nav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.hero { display: flex; flex-direction: column; gap: 26px; }
+.hero h1 { font-size: clamp(48px, 9vw, 96px); font-weight: 700; letter-spacing: -0.035em; line-height: .95; }
+.hero .intro { font-size: clamp(18px, 2.2vw, 22px); line-height: 1.45; max-width: 46ch; color: var(--ink-2); }
+.hero .intro b { color: var(--ink); font-weight: 600; }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.fig { padding: 18px 20px 18px 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fig + .fig { padding-left: 20px; border-left: 1px solid var(--hair); }
+.fig .n { font-family: var(--f-display); font-weight: 600; font-size: 40px; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.fig .n small { font-size: 20px; font-weight: 500; letter-spacing: 0; margin-left: 2px; }
+.fig .l { font-size: 14px; color: var(--muted); line-height: 1.35; }
+@media (max-width: 760px) {
+  .fig + .fig { padding-left: 0; border-left: 0; }
+  .fig { border-bottom: 1px solid var(--hair); padding-right: 12px; }
+}
+
+/* ---------- Секции ---------- */
+section { display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 16px; }
+.s-head { display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+.s-head h2 { font-size: clamp(28px, 3.6vw, 38px); font-weight: 600; letter-spacing: -0.025em; }
+.s-head p { color: var(--muted); font-size: 15.5px; }
+.sub-head { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; }
+.sub-head h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; }
+.sub-head p { color: var(--muted); font-size: 15px; max-width: 70ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+/* ---------- Плитки обзора ---------- */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.tile { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; min-width: 0; transition: border-color .15s ease, transform .15s ease; }
+a.tile:hover { border-color: var(--ink-2); transform: translateY(-2px); }
+.tile.wide { grid-column: span 2; }
+.tile-img { position: relative; flex: 1 1 auto; aspect-ratio: 16 / 10; background: var(--frame); min-height: 0; display: block; }
+.tile.wide .tile-img { aspect-ratio: 9 / 4; }
+.tile-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+.tile.mid .tile-img img { object-position: center; }
+.tile-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 5px; flex: none; }
+.tile-name { font: 600 20px/1.2 var(--f-display); letter-spacing: -0.015em; }
+.tile-line { font-size: 14.5px; color: var(--ink-2); line-height: 1.4; }
+.tile.more { padding: 16px 16px 8px; gap: 6px; }
+.tile.more .tile-name { margin-top: 5px; }
+.more-list { display: flex; flex-direction: column; margin-top: 6px; }
+.more-list a { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; border-top: 1px solid var(--hair); text-decoration: none; font-size: 14.5px; line-height: 1.35; }
+.more-list a b { font-weight: 600; }
+.more-list a span { color: var(--muted); font-size: 13.5px; }
+.more-list a:hover b { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 900px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile.more { grid-column: span 2; }
+}
+@media (max-width: 580px) {
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .tile.wide, .tile.more { grid-column: auto; }
+  .tile.wide .tile-img { aspect-ratio: 16 / 10; }
+}
+
+/* ---------- Лист продукта ---------- */
+.prods { display: flex; flex-direction: column; gap: 26px; }
+.prod {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 28px; display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 16px; min-width: 0;
+  transition: box-shadow .4s ease;
+}
+.prod.flash { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 45%, transparent); }
+.p-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.p-cat { display: inline-flex; align-items: center; gap: 7px; font-family: var(--f-mono); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.status { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; font-weight: 500; }
+.status i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.status.live i { background: var(--good); }
+.status.wip i { background: var(--wip); }
+.status.done i { background: var(--done); }
+.p-head { display: flex; flex-direction: column; gap: 10px; }
+.p-head h3 { font-size: clamp(28px, 3.8vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+.p-head .lede { font-size: 18px; line-height: 1.45; color: var(--ink-2); max-width: 62ch; }
+.chips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.chips li { font: 500 12.5px/1.3 var(--f-mono); color: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.prod-grid { display: grid; grid-template-columns: minmax(0, 350px) minmax(0, 1fr); gap: 34px; align-items: start; }
+.prod-info { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.prod-shots { min-width: 0; }
+.prod-grid.tall { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.prod-grid.tall .prod-shots { order: -1; }
+h4.lbl { font-family: var(--f-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.hl { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.hl li { padding-left: 18px; position: relative; }
+.hl li::before { content: ""; position: absolute; left: 2px; top: .7em; width: 7px; height: 2px; background: var(--c); border-radius: 1px; }
+.hl.cols { display: block; columns: 2 300px; column-gap: 44px; }
+.hl.cols li { break-inside: avoid; margin-bottom: 7px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 500 14px var(--f-body); padding: 9px 14px; border-radius: 9px; border: 1px solid var(--line); color: var(--ink); text-decoration: none; background: transparent; cursor: pointer; width: fit-content; }
+.btn:hover { border-color: var(--ink-2); background: var(--sunk); }
+@media (max-width: 940px) {
+  .prod-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .prod-shots { order: -1; }
+}
+@media (max-width: 580px) {
+  .wrap { gap: 58px; padding-block: 16px 48px; }
+  .prod { padding: 20px 16px 22px; gap: 20px; }
+}
+
+/* ---------- Снимки интерфейса ---------- */
+.shot { display: block; padding: 0; border: 1px solid var(--frame-line); background: var(--frame); border-radius: 10px; overflow: hidden; cursor: zoom-in; width: 100%; }
+.shot img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.shot:hover { border-color: var(--c); }
+.gal { display: flex; flex-direction: column; gap: 10px; }
+.gal-cap { font-size: 13.5px; color: var(--muted); min-height: 1.5em; }
+.gal-thumbs { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 8px; }
+.gal-thumbs button { padding: 0; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; background: var(--frame); cursor: pointer; aspect-ratio: 16 / 10; opacity: .62; }
+.gal-thumbs button:hover { opacity: 1; }
+.gal-thumbs button[aria-current="true"] { opacity: 1; border-color: var(--c); box-shadow: 0 0 0 1px var(--c); }
+.gal-thumbs img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+.strip { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x proximity; }
+.strip figure { margin: 0; flex: 0 0 196px; display: flex; flex-direction: column; gap: 8px; scroll-snap-align: start; }
+.strip figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.mosaic { columns: 2; column-gap: 12px; }
+.mosaic figure { margin: 0 0 12px; break-inside: avoid; display: flex; flex-direction: column; gap: 6px; }
+.mosaic figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+@media (max-width: 480px) { .mosaic { columns: 1; } }
+
+/* ---------- «Как устроено» ---------- */
+.deep { border-top: 1px solid var(--hair); padding-top: 14px; }
+.deep summary { cursor: pointer; font: 500 15px var(--f-body); list-style: none; display: inline-flex; align-items: center; gap: 10px; }
+.deep summary::-webkit-details-marker { display: none; }
+.deep summary::before { content: "+"; font-family: var(--f-mono); width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; font-size: 14px; line-height: 1; color: var(--ink-2); }
+.deep[open] summary::before { content: "−"; }
+.deep summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+.deep-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; padding-top: 20px; align-items: start; }
+.p-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; max-width: 66ch; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; counter-increment: s; }
+.steps li::before { content: counter(s); font-family: var(--f-mono); font-size: 12px; font-weight: 500; color: var(--ink-2); width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; margin-top: 1px; }
+.note { font-size: 15px; color: var(--ink-2); background: var(--sunk); border-radius: 10px; padding: 12px 14px; }
+.note b { color: var(--ink); font-weight: 600; }
+.passport { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.passport .ph { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 9px 14px; background: var(--sunk); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px; }
+.passport dl { margin: 0; }
+.passport .row { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--hair); font-size: 14px; }
+.passport .row:last-child { border-bottom: 0; }
+.passport dt { color: var(--muted); font-size: 13px; }
+.passport dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.passport dd .sub { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.passport dd .mono { font-size: 13px; }
+.passport .rel a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.passport .rel a:hover { text-decoration-color: var(--ink); }
+@media (max-width: 940px) {
+  .deep-body { grid-template-columns: minmax(0, 1fr); }
+  .passport { max-width: 520px; }
+}
+
+/* ---------- Видео ---------- */
+.vrows { display: flex; flex-direction: column; gap: 30px; }
+.vrow2 { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 2fr); gap: 30px 28px; }
+.series { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.series-head { display: flex; flex-direction: column; gap: 4px; }
+.series-head h4 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.series-head h4 span { font: 500 12.5px var(--f-mono); color: var(--muted); letter-spacing: 0; }
+.series-head p { color: var(--ink-2); font-size: 15px; max-width: 74ch; }
+.reel { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(148px, 1fr); gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x proximity; }
+.vfig { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; scroll-snap-align: start; }
+.vfig figcaption { font-size: 14px; line-height: 1.3; display: flex; flex-direction: column; gap: 1px; }
+.vfig figcaption b { font: 500 11.5px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.vid { position: relative; display: block; width: 100%; padding: 0; border: 1px solid var(--frame-line); border-radius: 12px; overflow: hidden; background: var(--frame); cursor: pointer; aspect-ratio: 9 / 16; }
+.vid img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .25s ease; }
+.vid:hover img { transform: scale(1.03); }
+.vid:hover { border-color: var(--c); }
+.vid .dur { position: absolute; top: 9px; right: 9px; font: 500 11.5px var(--f-mono); color: var(--lb-ink); background: rgba(0, 0, 0, .62); padding: 2px 6px; border-radius: 5px; }
+.vid .play { position: absolute; left: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: var(--lb-ink); display: grid; place-items: center; box-shadow: 0 2px 10px rgba(0, 0, 0, .45); }
+.vid .play::before { content: ""; border-style: solid; border-width: 7px 0 7px 12px; border-color: transparent transparent transparent var(--frame); margin-left: 3px; }
+.vid.soon { cursor: default; border-style: dashed; border-color: var(--line); background: transparent; color: var(--muted); display: grid; place-items: center; text-align: center; font-size: 13.5px; line-height: 1.4; padding: 12px; }
+@media (max-width: 820px) { .vrow2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Ещё проекты ---------- */
+.minis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.mini { padding: 24px; gap: 18px; }
+.mini .p-head h3 { font-size: 26px; }
+.mini .p-head .lede { font-size: 16px; }
+.mini .deep-body { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (max-width: 820px) { .minis { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Лента времени ---------- */
+.gantt { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px 14px; }
+.g-grid { display: grid; grid-template-columns: 170px minmax(0, 1fr); column-gap: 16px; }
+.g-axis { position: relative; height: 22px; grid-column: 2; }
+.g-axis span { position: absolute; top: 0; font-family: var(--f-mono); font-size: 11px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; padding-left: 6px; white-space: nowrap; }
+.g-row { display: contents; text-decoration: none; color: inherit; }
+.g-name { font-size: 14px; font-weight: 500; padding: 7px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 8px; }
+.g-track { position: relative; height: 36px; }
+.g-month { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--hair); }
+.g-today { position: absolute; top: -22px; bottom: 0; width: 0; border-left: 1px dashed var(--muted); }
+.g-today-l { position: absolute; top: -22px; font-family: var(--f-mono); font-size: 11px; color: var(--ink-2); padding-left: 5px; white-space: nowrap; }
+.g-bar { position: absolute; top: 9px; height: 18px; min-width: 6px; border-radius: 4px; background: color-mix(in srgb, var(--c) 24%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent); }
+.g-tick { position: absolute; top: 9px; height: 18px; width: 3px; margin-left: -1px; border-radius: 1px; background: var(--c); }
+.g-row:hover .g-name, .g-row:focus-visible .g-name { color: var(--c-app); text-decoration: underline; text-underline-offset: 3px; }
+.g-row:hover .g-bar { background: color-mix(in srgb, var(--c) 36%, transparent); }
+.g-note { margin-top: 10px; font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.g-note i { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+.g-note .k-bar { width: 22px; height: 12px; border-radius: 3px; background: color-mix(in srgb, var(--ink-2) 22%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-2) 50%, transparent); }
+.g-note .k-tick { width: 3px; height: 12px; border-radius: 1px; background: var(--ink-2); }
+@media (max-width: 640px) {
+  .gantt { padding: 14px 12px 12px; }
+  .g-grid { grid-template-columns: minmax(0, 1fr); }
+  .g-axis { grid-column: 1; }
+  .g-name { padding: 6px 0 0; font-size: 13px; }
+  .g-track { height: 26px; }
+  .g-today-l { display: none; }
+  .g-bar, .g-tick { top: 4px; }
+}
+
+/* ---------- Часы по дням ---------- */
+.hours { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 20px 14px; position: relative; }
+.h-plot { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; }
+.h-y { position: relative; height: 200px; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.h-y span { position: absolute; right: 0; transform: translateY(50%); }
+.h-area { position: relative; height: 200px; }
+.h-gl { position: absolute; left: 0; right: 0; height: 1px; background: var(--hair); }
+.h-gl.base { background: var(--line); }
+.h-cols { position: absolute; inset: 0; display: grid; gap: 2px; align-items: end; }
+.h-col { height: 100%; display: flex; flex-direction: column-reverse; gap: 2px; cursor: default; position: relative; }
+.h-col::after { content: ""; position: absolute; inset: 0 -1px; }
+.h-seg { width: 100%; flex: none; }
+.h-seg:last-child { border-radius: 4px 4px 0 0; }
+.h-col:hover .h-seg, .h-col.on .h-seg { filter: brightness(1.08) saturate(1.1); }
+.h-col.on { outline: 1px solid var(--ink-2); outline-offset: 1px; border-radius: 4px 4px 0 0; }
+.h-x { position: relative; height: 18px; margin-top: 6px; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.h-x span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.tip { position: absolute; z-index: 5; pointer-events: none; min-width: 180px; max-width: 260px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(10, 14, 22, .14); padding: 10px 12px; font-size: 13px; line-height: 1.4; }
+.tip b { font-family: var(--f-display); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px; }
+.tip .r { display: flex; align-items: center; gap: 7px; justify-content: space-between; }
+.tip .r span:first-child { display: inline-flex; align-items: center; gap: 7px; }
+.tip .t { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--hair); color: var(--muted); }
+details.table { font-size: 14px; color: var(--ink-2); }
+details.table summary { cursor: pointer; color: var(--muted); font-size: 13px; width: fit-content; }
+.tbl-wrap { overflow-x: auto; margin-top: 10px; }
+.tbl-wrap table { border-collapse: collapse; font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; min-width: 560px; }
+.tbl-wrap th, .tbl-wrap td { padding: 4px 10px; border-bottom: 1px solid var(--hair); text-align: right; white-space: nowrap; }
+.tbl-wrap th:first-child, .tbl-wrap td:first-child { text-align: left; }
+.tbl-wrap th { color: var(--muted); font-weight: 500; }
+@media (max-width: 580px) { .hours { padding: 16px 12px 12px; } }
+
+/* ---------- Языки и правила ---------- */
+.langs { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+.lang { display: grid; grid-template-columns: 170px minmax(0, 1fr) 84px; gap: 14px; align-items: center; font-size: 15px; }
+.lang .bar { height: 14px; background: var(--sunk); border-radius: 0 4px 4px 0; position: relative; }
+.lang .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink-2); border-radius: 0 4px 4px 0; }
+.lang .v { text-align: right; font-family: var(--f-mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.lang .who { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+@media (max-width: 580px) { .lang { grid-template-columns: 112px minmax(0, 1fr) 66px; gap: 10px; font-size: 14px; } }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.rule { padding: 20px 24px 22px 0; border-bottom: 1px solid var(--hair); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.rule h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+.rule p { color: var(--ink-2); font-size: 15px; }
+footer.method { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; max-width: 84ch; }
+footer.method b { color: var(--ink-2); font-weight: 600; }
+footer.method a { color: var(--ink-2); text-underline-offset: 3px; }
+
+/* ---------- Просмотр снимков и роликов ---------- */
+.lb {
+  position: fixed; inset: 0; z-index: 50; background: var(--lb-bg); color: var(--lb-ink);
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
+}
+.lb-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--lb-mut); }
+.lb-btn { background: transparent; border: 1px solid rgba(236, 238, 243, .28); color: var(--lb-ink); border-radius: 9px; padding: 8px 13px; font: 500 14px var(--f-body); cursor: pointer; }
+.lb-btn:hover { background: rgba(236, 238, 243, .12); }
+.lb-btn:disabled { opacity: .3; cursor: default; }
+.lb-stage { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; min-height: 0; min-width: 0; overflow: hidden; }
+.lb-stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: 8px; display: block; }
+.lb-stage video { height: 100%; max-width: 100%; aspect-ratio: 9 / 16; border-radius: 10px; display: block; background: var(--frame); }
+.lb-foot { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.lb-cap { text-align: center; font-size: 14.5px; line-height: 1.35; color: var(--lb-ink); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+
+  <div class="lead">
+    <div class="top">
+      <a class="brand" href="#overview">HumsteRD</a>
+      <nav aria-label="Разделы">
+        <a href="#overview">Обзор</a>
+        <a href="#products">Продукты</a>
+        <a href="#shorts">Видео</a>
+        <a href="#timeline">Хронология</a>
+        <a href="https://github.com/HumsteRD" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+    </div>
+    <header class="hero">
+      <div class="eyebrow">Портфолио · июль — ноябрь 2026</div>
+      <h1>HumsteRD</h1>
+      <p class="intro">Делаю <b>программы для Windows</b>, <b>ботов</b> для Telegram и Discord и <b>вертикальные ролики</b>, собранные кодом. Ниже продукты, их интерфейсы, фишки и видео.</p>
+      <div class="figures" id="figures"></div>
+    </header>
+  </div>
+
+  <section id="overview" aria-labelledby="t-over">
+    <div class="s-head">
+      <h2 id="t-over">Что я сделал</h2>
+      <p>Семь основных продуктов и четыре проекта поменьше. Нажмите на плитку, чтобы перейти к интерфейсу и подробностям.</p>
+    </div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section id="products" aria-labelledby="t-prod">
+    <div class="s-head">
+      <h2 id="t-prod">Продукты</h2>
+      <p>Интерфейс, фишки и устройство каждого. Снимки сняты с настоящих программ, нажмите на любой, чтобы увеличить.</p>
+    </div>
+    <div class="prods" id="prods"></div>
+  </section>
+
+  <section id="video" aria-labelledby="t-video">
+    <div class="s-head">
+      <h2 id="t-video">Видео</h2>
+      <p>Ролики смонтированы кодом в проекте Shorts. Нажмите на обложку, чтобы посмотреть. Здесь сжатые копии 720p.</p>
+    </div>
+    <div class="prods" id="videoBox"></div>
+  </section>
+
+  <section id="more" aria-labelledby="t-more">
+    <div class="s-head">
+      <h2 id="t-more">Ещё проекты</h2>
+      <p>Два бота, сервер и скрипт. У них нет своего окна, поэтому без снимков.</p>
+    </div>
+    <div class="minis" id="minis"></div>
+  </section>
+
+  <section id="timeline" aria-labelledby="t-time">
+    <div class="s-head">
+      <h2 id="t-time">Хронология</h2>
+      <p>Когда шёл каждый проект. Нажмите на строку, чтобы перейти к его описанию.</p>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="gantt">
+      <div class="g-grid" id="gantt"></div>
+      <div class="g-note"><span><i class="k-bar"></i>от первого до последнего следа работы</span><span><i class="k-tick"></i>дни с коммитами или сессиями</span></div>
+    </div>
+    <div class="sub-head">
+      <h3>Часы по дням</h3>
+      <p>Активное время в сессиях Claude Code, которые сохранились с 6 октября. Наведите на столбик, чтобы увидеть проекты за день.</p>
+    </div>
+    <div class="hours" id="hours">
+      <div class="h-plot">
+        <div class="h-y" id="hy"></div>
+        <div>
+          <div class="h-area" id="harea"></div>
+          <div class="h-x" id="hx"></div>
+        </div>
+      </div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <details class="table">
+      <summary>Таблица по дням</summary>
+      <div class="tbl-wrap" id="htable"></div>
+    </details>
+  </section>
+
+  <section id="stack" aria-labelledby="t-lang">
+    <div class="s-head">
+      <h2 id="t-lang">На чём написано</h2>
+      <p>Непустые строки исходного кода по всем проектам, без зависимостей и сборок.</p>
+    </div>
+    <div class="langs" id="langs"></div>
+  </section>
+
+  <section id="approach" aria-labelledby="t-rules">
+    <div class="s-head">
+      <h2 id="t-rules">Как я работаю</h2>
+      <p>Правила, которые повторяются от проекта к проекту.</p>
+    </div>
+    <div class="rules">
+      <div class="rule"><h3>Всё можно вернуть</h3><p>VELOCITY записывает состояние перед каждым изменением, Updater пишет файл отката, HwRename хранит оригинальные названия, Threat Scanner кладёт находки в карантин вместо удаления.</p></div>
+      <div class="rule"><h3>Без плацебо</h3><p>Никаких «+300% FPS». Если эффект спорный, так и написано. Updater прямо говорит, что пароли Chrome не переносятся, вместо того чтобы ломать их защиту.</p></div>
+      <div class="rule"><h3>Проверка на чистой системе</h3><p>Updater прогоняется в Windows Sandbox на свежей Windows 11, у Jarvis 454 автотеста, сканер проверяется на ложные срабатывания, у роликов проверяется микс.</p></div>
+      <div class="rule"><h3>Выпуск по тегу</h3><p>Ставлю тег в git, GitHub Actions собирает программу, гоняет тесты и выкладывает exe с контрольной суммой SHA-256. Updater и FI обновляются сами.</p></div>
+      <div class="rule"><h3>Свой стиль</h3><p>Оформление переходит между проектами: темы FI легли в VELOCITY, тема «Графит» из VELOCITY в Updater. Каждый сериал Shorts получает свой шрифт, титры и звук.</p></div>
+      <div class="rule"><h3>В паре с ИИ</h3><p>Идея, требования и решения мои. Код пишут ИИ-агенты Claude Code и Codex, а я проверяю результат, тестирую на своём ПК и веду проект дальше.</p></div>
+    </div>
+  </section>
+
+  <footer class="method">
+    <div><b>Как считалось.</b> Строки кода: непустые строки в исходниках (Python, C#, XAML, Go, C++, TypeScript, JS, HTML, CSS, скрипты) без node_modules, виртуальных окружений, сборок и сгенерированных файлов. Коммиты и выпуски: история git и теги на GitHub.</div>
+    <div><b>Часы</b> — активное время в сессиях Claude Code: паузы дольше 15 минут не считаются, параллельные чаты по одному проекту не складываются. Чаты до 6 октября потерялись при переустановке Windows, а работа в Codex сюда не попала, поэтому для Mailer-Bot, Marketplace Parser, ранних версий FI, VELOCITY и Threat Scanner реальных часов больше.</div>
+    <div><b>Снимки.</b> В окнах Threat Scanner и Luxery показаны демо-данные, в остальных настоящие.</div>
+    <div>Данные на 18 ноября 2026 · <a href="https://github.com/HumsteRD" target="_blank" rel="noopener">github.com/HumsteRD</a></div>
+  </footer>
+</div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Просмотр">
+  <div class="lb-bar"><span class="mono" id="lbCount"></span><button type="button" class="lb-btn" id="lbClose">Закрыть ✕</button></div>
+  <div class="lb-stage" id="lbStage"></div>
+  <div class="lb-foot"><button type="button" class="lb-btn" id="lbPrev" aria-label="Предыдущий">←</button><p class="lb-cap" id="lbCap"></p><button type="button" class="lb-btn" id="lbNext" aria-label="Следующий">→</button></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var M = "media/";
+
+  var CATS = {
+    app:   { name: "Программы для Windows", one: "Программа для Windows", v: "--c-app" },
+    bot:   { name: "Боты", one: "Бот", v: "--c-bot" },
+    video: { name: "Видео", one: "Видео", v: "--c-video" },
+    infra: { name: "Сервер и скрипты", one: "Сервер и скрипты", v: "--c-infra" },
+    other: { name: "Разное", one: "Разное", v: "--c-other" }
+  };
+
+  var P = [
+    {
+      id: "fi", name: "FI · Free Internet", cat: "app", status: ["live", "Выпущено · v0.4.1"],
+      thumb: "thumb-fi-wide", tw: 1440, th: 640,
+      tile: "Приложение в трее: возвращает YouTube, Discord, Telegram и звонки без ручной настройки.",
+      lede: "Приложение в трее, которое возвращает YouTube, Discord, Telegram и звонки без ручной настройки.",
+      feat: [
+        "Само подбирает способ обхода под провайдера, около трёх минут",
+        "Следит за работой и чинит себя, если способ перестал помогать",
+        "Встроенный прокси для Telegram и личный сервер в Cloudflare",
+        "Свой сайт добавляется одним полем, нужные домены FI находит сам",
+        "Кнопка «Не работает?» объясняет простым языком, что мешает",
+        "Восемь тем, свой цвет акцента, шрифт и масштаб"
+      ],
+      gal: "tall", sw: 750, sh: 1200,
+      shots: [
+        ["fi-main", "Главный экран: что работает и через что"],
+        ["fi-select", "Первый запуск: подбор способа под сеть"],
+        ["fi-site", "Добавление своего сайта"],
+        ["fi-diag", "Диагностика: что мешает обходу"],
+        ["fi-look", "Оформление: темы, акцент, шрифт"],
+        ["fi-anime", "Тема «Аниме»"],
+        ["fi-neon", "Тема «Неон»"],
+        ["fi-light", "Светлая тема"]
+      ],
+      why: "Обход замедлений через zapret обычно означает ручной перебор стратегий и .bat-файлов, а после изменений у провайдера всё ломается снова. Хотелось одну программу: поставил, она сама подобрала способ, следит за ним и объясняет, что делать, если сайт не открывается.",
+      steps: [
+        "Установщик ставит службу fi-service и движок winws из zapret.",
+        "Подбор в два этапа: быстрый отбор всех стратегий на настоящих сайтах, затем подробная проверка лидеров.",
+        "Служба следит за выбранной стратегией и подбирает новую, если старая перестала работать.",
+        "Telegram идёт через встроенный прокси, а если его адреса закрыты, через личный воркер в Cloudflare, который FI создаёт сам за три шага.",
+        "Окно на WebView2 говорит со службой через именованный канал, поэтому обход работает и с закрытым окном."
+      ],
+      hl: [
+        "Свои стратегии STABLE, LIGHT, HARD, SOCIAL, DISORDER и SEQOVL вдобавок к набору Flowseal",
+        "Пауза на 15 минут, час или три часа из окна или трея",
+        "Автообновление с проверкой подписи установщика"
+      ],
+      note: "Go даёт один небольшой exe и службу без рантайма. Wails v3 позволяет сделать интерфейс на HTML и JS без тяжёлого Electron.",
+      stack: "Go, Wails v3, WebView2, служба Windows, Cloudflare Workers", chip: "Go · Wails v3 · WebView2",
+      period: "сентябрь — ноябрь 2026",
+      seg: [["2026-09-14", "2026-11-15"]],
+      ticks: ["2026-09-18","2026-09-19","2026-09-26","2026-10-06","2026-10-08","2026-10-12","2026-10-13","2026-10-20","2026-10-21","2026-10-28","2026-11-02","2026-11-06","2026-11-10","2026-11-11","2026-11-15"],
+      lines: 29886, files: 233, langs: [["Go", 24899], ["JavaScript", 3839], ["CSS", 634]],
+      commits: 37, releases: 9, relText: "v0.2.0 → v0.4.1",
+      hours: 9.3, prompts: 40, actions: 2078,
+      check: "Подбор проверяет стратегии на реальных сайтах",
+      link: "https://github.com/HumsteRD/FreeInternet",
+      rel: ["velocity", "shorts"]
+    },
+    {
+      id: "velocity", name: "VELOCITY", cat: "app", status: ["live", "Выпущено · v0.4.0"],
+      thumb: "thumb-velocity",
+      tile: "Честный разбор игрового ПК с замерами «до» и «после».",
+      lede: "Разовый разбор игрового ПК: найти проблемы, замерить, исправить, замерить снова и получить отчёт.",
+      feat: [
+        "Разбор ПК за шесть шагов, от проверки до отчёта",
+        "Находит то, что годами незаметно: 60 Гц на быстром мониторе, выключенный XMP, лишние оверлеи",
+        "Любое изменение откатывается одной кнопкой",
+        "36 пошаговых руководств с отметками выполнения",
+        "Замер FPS в игре без сторонних программ",
+        "Не трогает игры и не конфликтует с античитами"
+      ],
+      gal: "wide", sw: 1180, sh: 790,
+      shots: [
+        ["velocity-diagnosis", "Разбор ПК: шесть шагов от проверки до отчёта"],
+        ["velocity-optimize", "Оптимизация: наборы настроек с пояснениями"],
+        ["velocity-guides", "Руководства: шаги, которые делаются руками"],
+        ["velocity-fps", "Замер FPS в игре"],
+        ["velocity-settings", "Оформление: десять тем, акцент и шрифт"]
+      ],
+      why: "Рынок «оптимизаторов» состоит из плацебо с фейковыми графиками и .bat-паков, после которых люди переустанавливают Windows. Нужен честный помощник, который объясняет каждое изменение и умеет вернуть всё назад.",
+      steps: [
+        "Проверка системы за доли секунды: частота монитора, XMP, одноканальная память, игры на HDD, лишние оверлеи, следы старых твиков.",
+        "Замер «до»: отклик системы за 20 секунд и FPS в игре по событиям DXGI Present через ETW.",
+        "Автоисправления одной кнопкой. Перед каждым изменением состояние системы записывается на диск.",
+        "Ручные шаги только те, что нужны этой системе: включить XMP, переставить планки памяти, сменить кабель монитора, обновить BIOS.",
+        "Замер «после» и HTML-отчёт в «Документах»."
+      ],
+      hl: [
+        "Каталог как данные: 95 твиков и 36 руководств с иллюстрациями в JSON",
+        "Откат возвращает значения ровно такими, какими они были, даже если их раньше не существовало",
+        "Полный перевод на английский, автотест не пропускает строку без перевода",
+        "Темы и настройки оформления перенесены из FI"
+      ],
+      note: "Три правила проекта: ничего необратимого, ничего недоказуемого, ничего опасного для античитов. Поэтому никаких инъекций в игры и драйверов ядра.",
+      stack: ".NET 9, WPF, C#, ETW", chip: ".NET 9 · WPF · C#",
+      period: "август — ноябрь 2026",
+      seg: [["2026-08-06", "2026-11-10"]],
+      ticks: ["2026-08-06","2026-09-22","2026-11-06","2026-11-08","2026-11-10"],
+      lines: 27152, files: 144, langs: [["C#", 22855], ["XAML", 4297]],
+      commits: 6, releases: 3, relText: "v0.2.0 → v0.4.0",
+      hours: 3.5, prompts: 19, actions: 676,
+      check: "SelfCheck применяет и откатывает настройки",
+      link: "https://github.com/HumsteRD/Velocity",
+      rel: ["fi", "updater"]
+    },
+    {
+      id: "updater", name: "Updater", cat: "app", status: ["live", "Выпущено · v1.1.2"],
+      thumb: "thumb-updater",
+      tile: "Переустановка Windows одной кнопкой: собрал на флешку, распаковал на новой системе.",
+      lede: "Переустановка Windows одной кнопкой: собрать всё на флешку на старой системе и вернуть на новой.",
+      feat: [
+        "Один exe без установки: собрал, переустановил Windows, распаковал",
+        "Переносит файлы, программы и их настройки, сохранения игр, драйверы, Wi-Fi и настройки Windows",
+        "Программы ставятся сами, даже если интернета ещё нет",
+        "Обновляется сам и сверяет файл по SHA-256",
+        "Настройки Windows можно откатить",
+        "Памятка перед переустановкой, чтобы ничего не забыть"
+      ],
+      gal: "wide", sw: 1280, sh: 800,
+      shots: [
+        ["updater-home", "Главный экран: собрать вещи или распаковать"],
+        ["updater-collect", "Сборы: что берём с собой", 1280, 728],
+        ["updater-progress", "Копирование на флешку"],
+        ["updater-done", "Итог сборов и памятка перед переустановкой"]
+      ],
+      why: "Переустановка обычно означает два вечера настройки: вспомнить программы, найти сохранения игр, перенести Wi-Fi и настройки. Программа сделана для всех, поэтому на новой системе ставится только то, что было на старой.",
+      steps: [
+        "Старая Windows: скан папок, программ и их настроек, сохранений игр, драйверов, Wi-Fi, шрифтов и настроек Windows.",
+        "Сборка на флешку или другой диск вместе с самой программой.",
+        "Новая Windows: первыми встают драйверы, затем программы через winget или установщики с флешки, а файлы копируются параллельно.",
+        "Встроенный офлайн-индекс сопоставляет установленные программы с пакетами winget.",
+        "В конце применяются настройки Windows, рядом пишется файл отката."
+      ],
+      hl: [
+        "4 выпуска за два дня, сборка и тесты в GitHub Actions по тегу",
+        "Windows Sandbox на чистой Windows 11: 65 из 65 и 68 из 68 проверок",
+        "Обновление с флешек FAT32 и exFAT: 14 из 14",
+        "Честно о паролях Chrome: они зашифрованы под старый ПК, и программа так и пишет"
+      ],
+      note: "Один exe с .NET внутри, установка не нужна. Программа копирует себя на флешку, поэтому на новой Windows ничего не надо скачивать.",
+      stack: ".NET 9, WPF, C#, PowerShell, winget", chip: ".NET 9 · WPF · C#",
+      period: "8–9 ноября 2026",
+      seg: [["2026-11-08", "2026-11-09"]],
+      ticks: ["2026-11-08","2026-11-09"],
+      lines: 11763, files: 64, langs: [["C#", 9522], ["XAML", 1711], ["PowerShell", 498]],
+      commits: 6, releases: 4, relText: "v1.0.0 → v1.1.2",
+      hours: 4.8, prompts: 20, actions: 861,
+      check: "SelfCheck: 192 проверки, Windows Sandbox",
+      link: "https://github.com/HumsteRD/Updater",
+      rel: ["velocity"]
+    },
+    {
+      id: "searcher", name: "Threat Scanner", cat: "app", status: ["live", "Выпущено · v2.0.0"],
+      thumb: "thumb-searcher",
+      tile: "Сканер вредоносных программ, который объясняет каждую находку.",
+      lede: "Проверка Windows на вредоносные программы: файлы, процессы, автозапуск, задачи, службы и сетевые соединения.",
+      feat: [
+        "Быстрая, полная и выборочная проверка с паузой",
+        "Объясняет по пунктам, почему файл опасен",
+        "Подозрительный файл можно запустить в песочнице Windows и посмотреть, что он делает",
+        "Около миллиона сигнатур, база обновляется каждый день",
+        "Карантин с возвратом, проверка флешек и новых загрузок",
+        "Четыре темы, русский и английский"
+      ],
+      gal: "wide", sw: 1280, sh: 800,
+      shots: [
+        ["scanner-home", "Обзор: состояние защиты (демо-данные)"],
+        ["scanner-scan", "Проверка идёт в фоне, можно работать дальше"],
+        ["scanner-results", "Находки с объяснением причин"],
+        ["scanner-behavior", "Поведение: запуск файла в Windows Sandbox"],
+        ["scanner-settings", "Настройки и темы"]
+      ],
+      why: "Хотелось понятный сканер, который не поднимает тревогу на каждый подписанный файл и не держит своё окно с правами администратора.",
+      steps: [
+        "Базы: около миллиона хэшей MalwareBazaar и правила YARA-Forge, обновляются в GitHub Actions каждый день.",
+        "Движок сверяет хэш, правила YARA и цифровую подпись, распаковывает ZIP и программы PyInstaller.",
+        "Политика вердикта: подписанные файлы известных производителей не помечаются по одной эвристике, слабые правила требуют подтверждения.",
+        "Карантин, удаление и отключение автозапуска выполняет отдельный помощник с правами администратора."
+      ],
+      hl: [
+        "Пункт в меню проводника и перетаскивание файла в окно",
+        "Во время игры или фильма плановая проверка ждёт",
+        "System32 и Program Files: 0 ложных находок"
+      ],
+      note: "C++ и Qt дают быстрый движок и нативное окно без рантайма. Права администратора вынесены в помощник, чтобы интерфейс работал обычным процессом.",
+      stack: "C++20, Qt 6, YARA, vcpkg, Inno Setup", chip: "C++20 · Qt 6 · YARA",
+      period: "сентябрь — ноябрь 2026",
+      seg: [["2026-09-24", "2026-11-10"]],
+      ticks: ["2026-09-24","2026-11-10"],
+      lines: 24458, files: 172, langs: [["C++", 22468], ["HTML", 1547], ["Python", 365]],
+      commits: 9, releases: 1, relText: "v2.0.0 и ежедневная база сигнатур",
+      hours: 1.4, prompts: 5, actions: 487,
+      check: "engine_selftest, core_selftest, скан System32",
+      link: "https://github.com/HumsteRD/Searcher",
+      rel: []
+    },
+    {
+      id: "luxery", name: "Luxery", cat: "app", status: ["wip", "В работе · v0.2.0"],
+      thumb: "thumb-luxery",
+      tile: "Автопилот продавца на FunPay, Playerok, GGSEL и LZT Market.",
+      lede: "Автопилот продавца игровых товаров: окно Windows, веб-панель и Telegram-бот с общими данными.",
+      feat: [
+        "Четыре площадки в одной панели: FunPay, Playerok, GGSEL, LZT Market",
+        "Автовыдача товара, ответы покупателям, поднятие лотов, ответы на отзывы",
+        "Плагины включаются по одному для каждого магазина",
+        "Выручка, средний чек и лучшие лоты на одном экране",
+        "Окно в трее с уведомлениями Windows, панель с телефона, меню в Telegram",
+        "Поиск и команды по Ctrl+K"
+      ],
+      gal: "wide", sw: 1304, sh: 850,
+      shots: [
+        ["luxery-overview", "Обзор: выручка, заказы и лента событий (демо-магазин)"],
+        ["luxery-plugins", "Плагины автоматизации"]
+      ],
+      why: "Платные FunPay Cardinal и FunPayPulse закрывают одну площадку. Нужен свой автопилот сразу на все: сначала бесплатно, потом за $5 навсегда.",
+      steps: [
+        "Ядро на Bun и TypeScript собирается в один exe: сервер, панель на React, плагины и Telegram-бот на grammY.",
+        "Адаптеры площадок и поставщиков написаны по их протоколам.",
+        "Плагины: автовыдача, ответы покупателям, поднятие лотов, отзывы, пополнение Steam, аренда аккаунтов с кодами Steam Guard.",
+        "Окно Windows на WebView2 запускает ядро, входит без пароля, живёт в трее и показывает уведомления.",
+        "Установщик ставит программу без прав администратора, для VPS есть установка службой systemd."
+      ],
+      hl: [
+        "18,9 тыс. строк за первый день",
+        "28 автотестов",
+        "Дальше: подключить живые аккаунты и поправить адаптеры по реальным ответам"
+      ],
+      note: "Одно ядро, три лица: в окне программы, в браузере с телефона и в меню Telegram одни и те же данные.",
+      stack: "Bun, TypeScript, React, grammY, .NET 4.8, WebView2, Inno Setup", chip: "Bun · TypeScript · React",
+      period: "17 ноября 2026 — сейчас",
+      seg: [["2026-11-17", "2026-11-18"]],
+      ticks: ["2026-11-17"],
+      lines: 18876, files: 79, langs: [["TypeScript", 10854], ["HTML", 4794], ["CSS", 2128]],
+      commits: 0, releases: 0,
+      hours: 1.5, prompts: 4, actions: 305,
+      check: "28 тестов (bun test), проверка типов",
+      rel: []
+    },
+    {
+      id: "jarvis", name: "Jarvis", cat: "bot", status: ["live", "Работает на сервере"],
+      thumb: "thumb-jarvis", mid: true,
+      tile: "Discord-бот с пультом в Telegram: модерация, защита, музыка.",
+      lede: "Discord-бот для своих серверов с пультом в Telegram: модерация, защита, бэкапы, музыка и ИИ.",
+      feat: [
+        "Модерация, защита от рейдов и фишинга, бэкапы сервера",
+        "Музыка с YouTube, Spotify, Яндекс Музыки, VK и SoundCloud",
+        "Карточки уровней, приветствия и баннер с живой статистикой",
+        "Пульт в Telegram: сервером можно управлять с телефона",
+        "Свой фирменный стиль: четыре палитры, набор иконок и стикеры",
+        "ИИ-собеседник, игры на компанию, розыгрыши, тикеты"
+      ],
+      gal: "mosaic",
+      shots: [
+        ["jarvis-gold", "Баннер бота, палитра «Золото»", 1360, 480],
+        ["jarvis-stickers", "Набор стикеров", 1080, 810],
+        ["jarvis-rank", "Карточка уровня по команде /rank", 960, 300],
+        ["jarvis-neon", "Палитра «Неон»", 1360, 480],
+        ["jarvis-tg", "Обложка пульта в Telegram", 1280, 560],
+        ["jarvis-banner", "Баннер сервера с живой статистикой", 960, 540]
+      ],
+      why: "Вместо десятка чужих ботов один свой, которым можно управлять с телефона через Telegram.",
+      steps: [
+        "Общее ядро на Python: настройки серверов, модули включаются и выключаются, уровни доступа, языки RU и EN.",
+        "Discord-часть на discord.py, Telegram-пульт на aiogram, аккаунты привязываются друг к другу.",
+        "Музыка через Lavalink, озвучка фраз через edge-tts, распознавание речи через faster-whisper.",
+        "Данные в SQLAlchemy с миграциями Alembic.",
+        "Бот живёт круглосуточно на своём сервере в Docker."
+      ],
+      hl: [
+        "Анти-фишинг по базе около 40 тыс. доменов, анти-рейд с капчей, анти-нюк с откатом из бэкапа",
+        "Бэкапы ролей, каналов и прав с восстановлением даже на новый сервер",
+        "Приватные голосовые комнаты, роли по кнопкам, каналы-счётчики",
+        "454 автотеста"
+      ],
+      note: "Самый большой проект по объёму кода. Делался по этапам из плана: от фундамента до ИИ-собеседника на локальной нейросети.",
+      stack: "Python, discord.py, aiogram 3, SQLAlchemy, Lavalink, Docker", chip: "Python · discord.py · aiogram",
+      period: "24 октября — 12 ноября 2026",
+      seg: [["2026-10-24", "2026-11-12"]],
+      ticks: ["2026-10-24","2026-10-25","2026-10-26","2026-10-27","2026-10-28","2026-10-29","2026-10-30","2026-10-31","2026-11-01","2026-11-02","2026-11-06","2026-11-07","2026-11-09","2026-11-10","2026-11-11","2026-11-12"],
+      lines: 40401, files: 193, langs: [["Python", 39907], ["HTML", 338], ["Batch", 128]],
+      commits: 0, releases: 0,
+      hours: 19.3, prompts: 96, actions: 4522,
+      check: "454 автотеста (pytest)",
+      rel: ["vps"]
+    },
+    {
+      id: "shorts", name: "Shorts", cat: "video", status: ["wip", "В работе · «Рейс 3112», 3 из 8"],
+      thumb: "thumb-shorts", mid: true,
+      tile: "Вертикальные сериалы-истории, смонтированные кодом.",
+      lede: "Студия вертикальных роликов-историй, где монтаж написан кодом.",
+      feat: [
+        "Ролик собирается кодом: сценарий в JSON превращается в готовое видео",
+        "Субтитры по словам, титры, счётчики и карта полёта нарисованы кодом",
+        "Кадры оживляет нейросеть на своей видеокарте RTX 3080",
+        "Автопроверка звука: голос всегда громче музыки, громкость −14 LUFS",
+        "У каждого сериала свой шрифт, титры и звук",
+        "Сюжеты и раскадровки мои, картинки сгенерированы по подробным промптам"
+      ],
+      why: "Делать TikTok-сериалы с озвучкой, субтитрами и звуком без монтажной программы, и чтобы каждый сериал выглядел по-своему, а не как шаблон.",
+      steps: [
+        "Сценарий серии в JSON: сцены, кадры и слово, на котором начинается каждый кадр.",
+        "Картинки из нейросети по подробным промптам, страница промптов собирается сама.",
+        "Кадры оживляет FreeVideo на своей RTX 3080, около 5,5 минуты на 5-секундный клип.",
+        "Озвучка, таймкоды слов через Whisper, музыка ACE-Step и звуки MOSS-SoundEffect, всё локально.",
+        "Сборка в Remotion, проверка микса и выравнивание громкости."
+      ],
+      note: "Remotion превращает ролик в React-компонент: титры, табло вылетов, карта полёта и посадочный талон нарисованы кодом и меняются от серии к серии.",
+      stack: "Remotion (React, TypeScript), Python, FreeVideo, ACE-Step, MOSS-SoundEffect, Whisper", chip: "Remotion · React · TypeScript",
+      period: "12 ноября 2026 — сейчас",
+      seg: [["2026-11-12", "2026-11-18"]],
+      ticks: ["2026-11-12","2026-11-13","2026-11-14","2026-11-15","2026-11-16","2026-11-17"],
+      lines: 9684, files: 79, langs: [["TypeScript", 7307], ["JavaScript", 1699], ["Python", 558]],
+      commits: 0, releases: 0, videos: 15,
+      hours: 14.5, prompts: 77, actions: 1984,
+      check: "mixcheck по дорожкам голоса, музыки и звуков",
+      rel: ["fi"]
+    },
+    {
+      id: "parser", name: "Marketplace Parser", cat: "bot", status: ["done", "Восстановлен, приватный режим"],
+      tile: "Telegram-бот ищет свежие объявления на 40 площадках",
+      lede: "Telegram-бот @allparsbot: находит свежие объявления на площадках разных стран по фильтрам пользователя.",
+      feat: [
+        "Около 40 площадок: OLX, Vinted, Kleinanzeigen, Subito, Wallapop, Etsy и другие",
+        "Автопоиски с фильтрами, новое объявление сразу приходит в Telegram",
+        "Подписка через CryptoBot, xRocket и Telegram Stars",
+        "Пульт для запуска на своём ПК: журнал, статистика, приватный режим"
+      ],
+      why: "Выгодные объявления разбирают в первые минуты. Бот сам проверяет площадки и присылает новое сразу, а доступ продаётся по подписке.",
+      steps: [
+        "Пользователь настраивает автопоиск в меню бота: площадка, страна, цена, слова-исключения.",
+        "Воркер на APScheduler по кругу опрашивает активные автопоиски.",
+        "Каждый скрапер приводит объявление к общей форме, поэтому боту всё равно, с какого сайта оно пришло.",
+        "Новые совпадения сохраняются и сразу уходят пользователю."
+      ],
+      hl: [
+        "Сайты узнают ботов по TLS-отпечатку, а curl_cffi с имитацией Chrome проходит без платных прокси",
+        "После переустановки Windows восстановлен по файлам, все 7 наборов проверок проходят"
+      ],
+      note: "Добавить площадку — это один класс-наследник BaseScraper и строка @register. Остальное приложение менять не нужно.",
+      stack: "Python, aiogram 3, curl_cffi, APScheduler, SQLite или PostgreSQL + Redis, Docker", chip: "Python · aiogram 3 · curl_cffi",
+      period: "июль — сентябрь 2026",
+      seg: [["2026-07-10", "2026-09-26"], ["2026-11-17", "2026-11-17"]],
+      ticks: ["2026-07-10","2026-09-26","2026-11-17"],
+      lines: 15028, files: 145, langs: [["Python", 15028]],
+      commits: 0, releases: 0,
+      hours: 0.3, prompts: 3, actions: 63, lost: true,
+      check: "verify_all: 7 наборов, тест реального опроса",
+      rel: []
+    },
+    {
+      id: "mailer", name: "Mailer-Bot", cat: "bot", status: ["done", "Готово"],
+      tile: "Рассылка писем по согласию с управлением из Telegram",
+      lede: "Рассылка шаблонных писем сотрудникам и согласившимся контактам, с управлением из Telegram.",
+      feat: [
+        "Шаблоны с подстановками, получатели из TXT и CSV",
+        "8 почтовых сервисов и любой SMTP, ротация ключей и дневные лимиты",
+        "Отписка в один клик, отписавшиеся исключаются сами",
+        "Роли admin, operator и viewer с журналом действий"
+      ],
+      why: "Разослать приглашения со ссылкой на Zoom сотням людей так, чтобы письма доходили, а отписавшиеся больше ничего не получали.",
+      steps: [
+        "Шаблоны писем с подстановками {name}, {zoom_link}, {date} и любыми колонками из CSV.",
+        "Импорт получателей с проверкой адресов и удалением дублей, тестовое письмо на один адрес.",
+        "Пакетная отправка через официальные API с настраиваемой скоростью и повторами.",
+        "Отписка по ссылке и заголовку List-Unsubscribe."
+      ],
+      note: "Только официальные API отправки, без браузерных cookies: так письма доходят и не нарушаются правила сервисов.",
+      stack: "Python, Telegram-бот, SQLite, cryptography", chip: "Python · Telegram · SQLite",
+      period: "16–18 июля 2026",
+      seg: [["2026-07-16", "2026-07-18"]],
+      ticks: ["2026-07-16","2026-07-18"],
+      lines: 4495, files: 43, langs: [["Python", 4473], ["HTML", 22]],
+      commits: 0, releases: 0,
+      hours: null, lost: true,
+      rel: []
+    },
+    {
+      id: "vps", name: "Свой сервер", cat: "infra", status: ["live", "Работает"],
+      tile: "Удалённый рабочий стол и круглосуточный хостинг бота",
+      lede: "Облачный Ubuntu с рабочим столом по RDP и домом для Jarvis.",
+      feat: [
+        "Рабочий стол открывается одним ярлыком",
+        "Вход по SSH-ключу, соединение идёт внутри защищённого туннеля",
+        "Jarvis работает в Docker и не зависит от домашнего ПК"
+      ],
+      why: "Чтобы бот работал круглосуточно без включённого ПК, а на сервер можно было зайти как на обычный компьютер.",
+      steps: [
+        "Вход по SSH-ключу, пароли в скриптах не хранятся.",
+        "Рабочий стол XFCE через xrdp внутри SSH-туннеля, запуск одним ярлыком.",
+        "Jarvis переехал с ПК в docker-compose на сервере, локальная копия выключена."
+      ],
+      stack: "Ubuntu, XFCE, xrdp, SSH, Docker", chip: "Ubuntu · xrdp · Docker",
+      period: "10–15 ноября 2026",
+      seg: [["2026-11-10", "2026-11-15"]],
+      ticks: ["2026-11-10","2026-11-12","2026-11-15"],
+      lines: 37, files: 3, langs: [["Batch", 22], ["PowerShell", 15]],
+      commits: 0, releases: 0,
+      hours: 2.7, prompts: 40, actions: 414,
+      rel: ["jarvis"]
+    },
+    {
+      id: "hwrename", name: "HwRename", cat: "infra", status: ["done", "Готово"],
+      tile: "Скрипт меняет названия железа в Диспетчере задач",
+      lede: "Скрипт, который меняет названия процессора и видеокарты в Диспетчере задач и окне «О системе».",
+      feat: [
+        "Одна команда меняет название процессора и видеокарты",
+        "Оригинальные названия сохраняются, ключ -Restore возвращает их",
+        "Чистая косметика: игры и драйверы видят настоящее железо"
+      ],
+      why: "Шутка для скриншотов: показать в Диспетчере задач RTX 5090.",
+      steps: [
+        "При первом запуске сохраняет оригинальные названия в файл рядом со скриптом.",
+        "Меняет отображаемые имена в реестре и перезапускает видеодрайвер.",
+        "Ключ -Restore возвращает всё как было."
+      ],
+      stack: "PowerShell", chip: "PowerShell",
+      period: "13 ноября 2026",
+      seg: [["2026-11-13", "2026-11-13"]],
+      ticks: ["2026-11-13"],
+      lines: 163, files: 1, langs: [["PowerShell", 163]],
+      commits: 0, releases: 0,
+      hours: 0.2, prompts: 3, actions: 23,
+      rel: []
+    }
+  ];
+
+  var SERIES = [
+    { id: "ship", name: "«10 на борту»", meta: "6 серий · сериал завершён",
+      desc: "Мистический мини-сериал. Грузовое судно идёт с Камчатки на Аляску, на борту десять человек, и каждый день кто-то исчезает. Сюжет мой, кадры сгенерированы нейросетью по моим промптам, счётчик экипажа и субтитры нарисованы кодом." },
+    { id: "plane", name: "«Рейс 3112»", meta: "3 серии из 8",
+      desc: "Ночной рейс Москва — Магадан 31 декабря. У пассажира пропадает сын, а Новый год так и не наступает. Каждый кадр оживлён нейросетью, титры сделаны как табло вылетов." },
+    { id: "solo", name: "Отдельные ролики", meta: "",
+      desc: "Плоская анимация целиком из кода и ролик о приложении FI." }
+  ];
+  var V = [
+    { id: "ship-1", s: "ship", n: "Часть 1", t: "Новенькие", d: "1:13" },
+    { id: "ship-2", s: "ship", n: "Часть 2", t: "Минус один", d: "1:13" },
+    { id: "ship-3", s: "ship", n: "Часть 3", t: "Пыль", d: "1:13" },
+    { id: "ship-4", s: "ship", n: "Часть 4", t: "Заперто изнутри", d: "1:12" },
+    { id: "ship-5", s: "ship", n: "Часть 5", t: "Здесь нам не выжить", d: "1:11" },
+    { id: "ship-6", s: "ship", n: "Часть 6 · финал", t: "Судовая роль", d: "1:15" },
+    { id: "plane-1", s: "plane", n: "Часть 1", t: "Привет, Дима", d: "1:13" },
+    { id: "plane-2", s: "plane", n: "Часть 2", t: "С Новым годом", d: "1:12" },
+    { id: "plane-3", s: "plane", n: "Часть 3", t: "Три коротких, три длинных", d: "1:05" },
+    { id: "duck-story", s: "solo", n: "Реальная история", t: "Утиный десант", d: "0:32" },
+    { id: "fi-promo", s: "solo", n: "Ролик о приложении", t: "FI · Free Internet", d: "0:32" }
+  ];
+
+  var DAILY = {"2026-10-06":{"fi":0.35},"2026-10-08":{"fi":0.11},"2026-10-12":{"fi":1.51},"2026-10-13":{"other":0.19,"fi":0.32},"2026-10-15":{"other":0.77},"2026-10-20":{"fi":0.49},"2026-10-21":{"fi":1.9},"2026-10-23":{"other":0.06},"2026-10-24":{"jarvis":0.28},"2026-10-25":{"jarvis":7.33},"2026-10-26":{"jarvis":2.11},"2026-10-27":{"jarvis":0.49},"2026-10-28":{"other":0.04,"jarvis":0.23,"fi":0.35},"2026-10-29":{"other":0.02,"jarvis":1.36},"2026-10-30":{"jarvis":2.7},"2026-10-31":{"jarvis":0.35},"2026-11-01":{"jarvis":0.23},"2026-11-02":{"other":0.01,"jarvis":1.94,"fi":0.49},"2026-11-03":{"other":1.25},"2026-11-04":{"other":0.1},"2026-11-05":{"other":0.06},"2026-11-06":{"other":1.0,"velocity":3.03,"jarvis":0.58,"fi":0.5},"2026-11-07":{"jarvis":0.4},"2026-11-08":{"updater":3.59,"velocity":0.32},"2026-11-09":{"other":0.86,"updater":1.21,"jarvis":0.87},"2026-11-10":{"other":0.13,"velocity":0.13,"searcher":1.4,"vps":1.92,"jarvis":0.07,"fi":0.05},"2026-11-11":{"jarvis":0.2,"fi":1.57},"2026-11-12":{"shorts":1.57,"vps":0.39,"jarvis":0.18},"2026-11-13":{"shorts":1.97,"hwrename":0.15},"2026-11-14":{"shorts":3.72},"2026-11-15":{"shorts":0.15,"vps":0.38,"fi":1.7},"2026-11-16":{"shorts":5.84},"2026-11-17":{"shorts":1.22,"parser":0.28,"luxery":1.49}};
+
+  var LANGS = [
+    ["Python", 60363, "Jarvis, Marketplace Parser, Mailer-Bot"],
+    ["C# и XAML", 39255, "VELOCITY, Updater, оболочка Luxery"],
+    ["Go", 24899, "FI"],
+    ["C++", 22468, "Threat Scanner"],
+    ["TypeScript", 18161, "Luxery, Shorts"],
+    ["HTML, CSS, JS", 15324, "интерфейсы FI и Luxery, отчёты"],
+    ["Скрипты", 1473, "PowerShell, bat, sh, Inno Setup"]
+  ];
+
+  var BY = {}; P.forEach(function (p) { BY[p.id] = p; });
+  var NAMES = { other: "Разное: мелкие задачи по ПК" };
+  P.forEach(function (p) { NAMES[p.id] = p.name; });
+  function catOf(id) { return id === "other" ? "other" : BY[id].cat; }
+  function $(id) { return document.getElementById(id); }
+  function fmt(n) { return Math.round(n).toLocaleString("ru-RU"); }
+  function fh(n) { return (Math.round(n * 10) / 10).toLocaleString("ru-RU"); }
+  function pl(n, f) { var a = Math.abs(n) % 100, b = a % 10; if (a > 10 && a < 20) return f[2]; if (b > 1 && b < 5) return f[1]; if (b === 1) return f[0]; return f[2]; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function day(s) { var a = s.split("-"); return Date.UTC(+a[0], +a[1] - 1, +a[2]) / 864e5; }
+  function cvar(cat) { return "var(" + CATS[cat].v + ")"; }
+  function li(s) { return "<li>" + esc(s) + "</li>"; }
+
+  /* ---------- Сводка ---------- */
+  var totalLines = P.reduce(function (s, p) { return s + p.lines; }, 0);
+  var totalRel = P.reduce(function (s, p) { return s + (p.releases || 0); }, 0);
+  var totalHours = 0; Object.keys(DAILY).forEach(function (d) { Object.keys(DAILY[d]).forEach(function (k) { totalHours += DAILY[d][k]; }); });
+  var figs = [
+    [P.length, "", "проектов: программы, боты, видео и сервер"],
+    [Math.round(totalLines / 1000), "тыс.", "непустых строк кода"],
+    [totalRel, "", "выпусков на GitHub у четырёх программ"],
+    [BY.shorts.videos, "", "готовых роликов, " + V.length + " из них на этой странице"],
+    [Math.round(totalHours), "ч", "в сессиях Claude Code с 6 октября"]
+  ];
+  $("figures").innerHTML = figs.map(function (f) {
+    return '<div class="fig"><div class="n">' + f[0] + (f[1] ? "<small>" + f[1] + "</small>" : "") + '</div><div class="l">' + f[2] + "</div></div>";
+  }).join("");
+
+  /* ---------- Плитки обзора ---------- */
+  var MAIN = ["fi", "velocity", "updater", "searcher", "luxery", "jarvis", "shorts"];
+  var MORE = ["parser", "mailer", "vps", "hwrename"];
+  $("tiles").innerHTML = MAIN.map(function (id, i) {
+    var p = BY[id];
+    return '<a class="tile' + (i === 0 ? " wide mid" : "") + (p.mid ? " mid" : "") + '" href="#' + id + '" style="--c:' + cvar(p.cat) + '">' +
+      '<span class="tile-img"><img src="' + M + p.thumb + '.webp" alt="" width="' + (p.tw || 960) + '" height="' + (p.th || 600) + '"></span>' +
+      '<span class="tile-body"><span class="p-cat"><i class="sw"></i>' + CATS[p.cat].one + '</span><b class="tile-name">' + esc(p.name) + '</b><span class="tile-line">' + esc(p.tile) + "</span></span></a>";
+  }).join("") +
+    '<div class="tile more"><span class="p-cat">Ещё проекты</span><div class="more-list">' + MORE.map(function (id) {
+      var p = BY[id];
+      return '<a href="#' + id + '"><b>' + esc(p.name) + "</b><span>" + esc(p.tile) + "</span></a>";
+    }).join("") + "</div></div>";
+
+  /* ---------- Листы продуктов ---------- */
+  var G = {};
+  function head(p) {
+    var c = [p.chip, p.period, fmt(p.lines) + " " + pl(p.lines, ["строка", "строки", "строк"]) + " кода"];
+    if (p.releases) c.push(p.releases + " " + pl(p.releases, ["выпуск", "выпуска", "выпусков"]) + " на GitHub");
+    if (p.videos) c.push(p.videos + " " + pl(p.videos, ["ролик", "ролика", "роликов"]));
+    return '<header class="p-head"><div class="p-meta"><span class="p-cat"><i class="sw"></i>' + CATS[p.cat].one + '</span><span class="status ' + p.status[0] + '"><i></i>' + esc(p.status[1]) + "</span></div>" +
+      "<h3>" + esc(p.name) + '</h3><p class="lede">' + esc(p.lede) + '</p><ul class="chips">' + c.map(li).join("") + "</ul></header>";
+  }
+  function shotBtn(id, it, i, lazy) {
+    return '<button type="button" class="shot" data-g="' + id + '" data-i="' + i + '" style="aspect-ratio:' + it.w + "/" + it.h + '" aria-label="Увеличить: ' + esc(it.cap) + '"><img' + (lazy ? ' loading="lazy"' : "") + ' src="' + it.src + '" alt="' + esc(it.cap) + '" width="' + it.w + '" height="' + it.h + '"></button>';
+  }
+  function shots(p) {
+    var items = p.shots.map(function (s) { return { type: "img", src: M + s[0] + ".webp", cap: p.name + ". " + s[1], short: s[1], w: s[2] || p.sw, h: s[3] || p.sh }; });
+    G[p.id] = items;
+    if (p.gal === "tall" || p.gal === "mosaic") {
+      return '<div class="' + (p.gal === "tall" ? "strip" : "mosaic") + '">' + items.map(function (it, i) {
+        return "<figure>" + shotBtn(p.id, it, i, true) + "<figcaption>" + esc(it.short) + "</figcaption></figure>";
+      }).join("") + "</div>";
+    }
+    var it = items[0];
+    return '<div class="gal" data-gal="' + p.id + '">' +
+      '<button type="button" class="shot main" data-g="' + p.id + '" data-i="0" style="aspect-ratio:' + p.sw + "/" + p.sh + '" aria-label="Увеличить снимок"><img loading="lazy" src="' + it.src + '" alt="' + esc(it.cap) + '" width="' + it.w + '" height="' + it.h + '"></button>' +
+      '<p class="gal-cap">' + esc(it.short) + "</p>" +
+      '<div class="gal-thumbs" style="--n:' + Math.max(items.length, 4) + '">' + items.map(function (t, i) {
+        return '<button type="button" data-t="' + i + '" aria-current="' + (i === 0) + '" aria-label="' + esc(t.short) + '"><img loading="lazy" src="' + t.src + '" alt="" width="' + t.w + '" height="' + t.h + '"></button>';
+      }).join("") + "</div></div>";
+  }
+  function passport(p) {
+    var langs = p.langs.map(function (l) { return l[0] + " " + fmt(l[1]); }).join(" · ");
+    var git = p.commits ? fmt(p.commits) + " " + pl(p.commits, ["коммит", "коммита", "коммитов"]) + (p.releases ? " · " + p.releases + " " + pl(p.releases, ["выпуск", "выпуска", "выпусков"]) : "") : "без публичного репозитория";
+    var claude = p.hours != null ? '<span class="mono">' + fh(p.hours) + " ч</span> · " + p.prompts + " " + pl(p.prompts, ["запрос", "запроса", "запросов"]) + '<span class="sub">' + fmt(p.actions) + " " + pl(p.actions, ["действие", "действия", "действий"]) + " агента" + (p.lost ? ", ранний чат не сохранился" : "") + "</span>" : "чат не сохранился";
+    var rows = [
+      ["Срок", esc(p.period)],
+      ["Стек", esc(p.stack)],
+      ["Код", '<span class="mono">' + fmt(p.lines) + "</span> " + pl(p.lines, ["строка", "строки", "строк"]) + " · " + p.files + " " + pl(p.files, ["файл", "файла", "файлов"]) + '<span class="sub">' + esc(langs) + "</span>"],
+      ["Git", git + (p.relText ? '<span class="sub">' + esc(p.relText) + "</span>" : "")]
+    ];
+    if (p.videos) rows.push(["Ролики", p.videos + " готовых"]);
+    rows.push(["С Claude", claude]);
+    if (p.check) rows.push(["Проверка", esc(p.check)]);
+    if (p.rel && p.rel.length) rows.push(["Связано", '<span class="rel">' + p.rel.map(function (r) { return '<a href="#' + r + '">' + esc(BY[r].name) + "</a>"; }).join(", ") + "</span>"]);
+    return '<aside class="passport" aria-label="Паспорт проекта"><div class="ph"><span>Паспорт</span><span>' + esc(p.id) + "</span></div><dl>" +
+      rows.map(function (r) { return '<div class="row"><dt>' + r[0] + "</dt><dd>" + r[1] + "</dd></div>"; }).join("") + "</dl></aside>";
+  }
+  function deep(p) {
+    return '<details class="deep"><summary>Как устроено и почему</summary><div class="deep-body"><div class="p-main">' +
+      '<div><h4 class="lbl">Зачем</h4><p>' + esc(p.why) + "</p></div>" +
+      '<div><h4 class="lbl">Как работает</h4><ol class="steps">' + p.steps.map(function (s) { return "<li><span>" + esc(s) + "</span></li>"; }).join("") + "</ol></div>" +
+      (p.hl ? '<div><h4 class="lbl">Детали</h4><ul class="hl">' + p.hl.map(li).join("") + "</ul></div>" : "") +
+      (p.note ? '<p class="note"><b>Почему так.</b> ' + esc(p.note) + "</p>" : "") +
+      "</div>" + passport(p) + "</div></details>";
+  }
+  function repo(p) {
+    return p.link ? '<a class="btn" href="' + p.link + '" target="_blank" rel="noopener">Код на GitHub <span aria-hidden="true">↗</span></a>' : "";
+  }
+  $("prods").innerHTML = MAIN.filter(function (id) { return id !== "shorts"; }).map(function (id) {
+    var p = BY[id], tall = p.gal === "tall";
+    return '<article class="prod" id="' + p.id + '" style="--c:' + cvar(p.cat) + '">' + head(p) +
+      '<div class="prod-grid ' + p.gal + '"><div class="prod-info"><div><h4 class="lbl">Фишки</h4><ul class="hl' + (tall ? " cols" : "") + '">' + p.feat.map(li).join("") + "</ul></div>" + repo(p) + "</div>" +
+      '<div class="prod-shots">' + shots(p) + "</div></div>" + deep(p) + "</article>";
+  }).join("");
+
+  /* ---------- Видео ---------- */
+  G.video = V.map(function (v) {
+    var s = SERIES.filter(function (x) { return x.id === v.s; })[0];
+    return { type: "vid", src: M + v.id + ".mp4", poster: M + "poster-" + v.id + ".webp", cap: (v.s === "solo" ? "" : s.name + " · ") + v.n + " · " + v.t };
+  });
+  function vcard(v) {
+    var i = V.indexOf(v);
+    return '<figure class="vfig"><button type="button" class="vid" data-g="video" data-i="' + i + '" aria-label="Смотреть: ' + esc(v.n + ", " + v.t) + '"><img loading="lazy" src="' + M + "poster-" + v.id + '.webp" alt="" width="540" height="960"><span class="dur">' + v.d + '</span><span class="play" aria-hidden="true"></span></button><figcaption><b>' + esc(v.n) + "</b>" + esc(v.t) + "</figcaption></figure>";
+  }
+  function series(s, extra) {
+    return '<div class="series"><div class="series-head"><h4>' + esc(s.name) + (s.meta ? "<span>" + esc(s.meta) + "</span>" : "") + "</h4><p>" + esc(s.desc) + '</p></div><div class="reel">' +
+      V.filter(function (v) { return v.s === s.id; }).map(vcard).join("") + (extra || "") + "</div></div>";
+  }
+  var S = BY.shorts;
+  var soon = '<figure class="vfig"><div class="vid soon">Сценарий готов, идёт работа над кадрами</div><figcaption><b>Часть 4</b>Он видел</figcaption></figure>';
+  $("videoBox").innerHTML = '<article class="prod" id="shorts" style="--c:' + cvar("video") + '">' + head(S) +
+    '<div class="vrows">' + series(SERIES[0]) + '<div class="vrow2">' + series(SERIES[1], soon) + series(SERIES[2]) + "</div></div>" +
+    '<div><h4 class="lbl">Фишки</h4><ul class="hl cols">' + S.feat.map(li).join("") + "</ul></div>" + deep(S) + "</article>";
+
+  /* ---------- Ещё проекты ---------- */
+  $("minis").innerHTML = MORE.map(function (id) {
+    var p = BY[id];
+    return '<article class="prod mini" id="' + p.id + '" style="--c:' + cvar(p.cat) + '">' + head(p) + '<ul class="hl">' + p.feat.map(li).join("") + "</ul>" + deep(p) + "</article>";
+  }).join("");
+
+  $("legend").innerHTML = ["app", "bot", "video", "infra"].map(function (c) {
+    return '<span><i class="sw" style="--c:' + cvar(c) + '"></i>' + CATS[c].name + "</span>";
+  }).join("");
+
+  /* ---------- Лента времени ---------- */
+  var G0 = day("2026-07-01"), G1 = day("2026-12-01"), GSPAN = G1 - G0, TODAY = day("2026-11-18");
+  function gx(d) { return ((d - G0) / GSPAN * 100).toFixed(3) + "%"; }
+  var months = [["2026-07-01", "июль"], ["2026-08-01", "август"], ["2026-09-01", "сентябрь"], ["2026-10-01", "октябрь"], ["2026-11-01", "ноябрь"]];
+  var gh = '<div class="g-axis">' + months.map(function (m) { return '<span style="left:' + gx(day(m[0])) + '">' + m[1] + "</span>"; }).join("") + "</div>";
+  P.slice().sort(function (a, b) { return day(a.seg[0][0]) - day(b.seg[0][0]); }).forEach(function (p, i) {
+    var c = cvar(p.cat);
+    var lines = months.map(function (m) { return '<span class="g-month" style="left:' + gx(day(m[0])) + '"></span>'; }).join("");
+    var bars = p.seg.map(function (s) {
+      var a = day(s[0]), b = day(s[1]) + 1;
+      return '<span class="g-bar" style="left:' + gx(a) + ";width:" + ((b - a) / GSPAN * 100).toFixed(3) + '%"></span>';
+    }).join("");
+    var ticks = p.ticks.map(function (t) { return '<i class="g-tick" style="left:' + gx(day(t) + 0.5) + '"></i>'; }).join("");
+    var today = i === 0 ? '<span class="g-today" style="left:' + gx(TODAY) + '"></span><span class="g-today-l" style="left:' + gx(TODAY) + '">сегодня</span>' : '<span class="g-today" style="left:' + gx(TODAY) + ';top:0"></span>';
+    gh += '<a class="g-row" href="#' + p.id + '" style="--c:' + c + '" title="' + esc(p.name + ": " + p.period) + '">' +
+      '<span class="g-name"><i class="sw"></i>' + esc(p.name) + "</span>" +
+      '<span class="g-track">' + lines + bars + ticks + today + "</span></a>";
+  });
+  $("gantt").innerHTML = gh;
+
+  /* ---------- Часы по дням ---------- */
+  var H0 = day("2026-10-05"), H1 = day("2026-11-18"), HN = H1 - H0 + 1, YMAX = 8;
+  var area = $("harea");
+  var gl = "";
+  for (var y = 0; y <= YMAX; y += 2) gl += '<div class="h-gl' + (y === 0 ? " base" : "") + '" style="bottom:' + (y / YMAX * 100) + '%"></div>';
+  $("hy").innerHTML = [0, 2, 4, 6, 8].map(function (y) { return '<span style="bottom:' + (y / YMAX * 100) + '%">' + y + " ч</span>"; }).join("");
+  var CORDER = ["app", "bot", "video", "infra", "other"];
+  var days = [];
+  for (var d = H0; d <= H1; d++) {
+    var dt = new Date(d * 864e5);
+    var key = dt.toISOString().slice(0, 10);
+    days.push({ d: d, key: key, dt: dt, v: DAILY[key] || {} });
+  }
+  var cols = '<div class="h-cols" style="grid-template-columns:repeat(' + HN + ',minmax(0,1fr))">';
+  days.forEach(function (o, i) {
+    var byCat = {};
+    Object.keys(o.v).forEach(function (k) { var c = catOf(k); byCat[c] = (byCat[c] || 0) + o.v[k]; });
+    var segs = CORDER.filter(function (c) { return byCat[c] > 0; }).map(function (c) {
+      return '<span class="h-seg" style="height:calc(' + (byCat[c] / YMAX * 100).toFixed(2) + '% - 2px);min-height:2px;background:' + cvar(c) + '"></span>';
+    }).join("");
+    cols += '<div class="h-col" data-i="' + i + '" tabindex="' + (segs ? 0 : -1) + '">' + segs + "</div>";
+  });
+  cols += "</div>";
+  area.innerHTML = gl + cols;
+  var WD = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+  var MS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+  $("hx").innerHTML = days.map(function (o, i) {
+    if (o.dt.getUTCDay() !== 1) return "";
+    return '<span style="left:' + ((i + 0.5) / HN * 100).toFixed(2) + '%">' + o.dt.getUTCDate() + "." + String(o.dt.getUTCMonth() + 1).padStart(2, "0") + "</span>";
+  }).join("");
+
+  var tip = $("tip"), hoursBox = $("hours");
+  function showTip(col) {
+    var o = days[+col.getAttribute("data-i")];
+    var ks = Object.keys(o.v).sort(function (a, b) { return o.v[b] - o.v[a]; });
+    if (!ks.length) { tip.hidden = true; return; }
+    var tot = ks.reduce(function (s, k) { return s + o.v[k]; }, 0);
+    tip.innerHTML = "<b>" + o.dt.getUTCDate() + " " + MS[o.dt.getUTCMonth()] + ", " + WD[o.dt.getUTCDay()] + "</b>" +
+      ks.map(function (k) { return '<div class="r"><span><i class="sw" style="--c:' + cvar(catOf(k)) + '"></i>' + esc(NAMES[k]) + '</span><span class="mono">' + fh(o.v[k]) + " ч</span></div>"; }).join("") +
+      '<div class="r t"><span>Всего</span><span class="mono">' + fh(tot) + " ч</span></div>";
+    tip.hidden = false;
+    var br = hoursBox.getBoundingClientRect(), cr = col.getBoundingClientRect();
+    var x = cr.left - br.left + cr.width / 2 - tip.offsetWidth / 2;
+    x = Math.max(8, Math.min(x, br.width - tip.offsetWidth - 8));
+    var topSeg = col.lastElementChild;
+    var top = (topSeg ? topSeg.getBoundingClientRect().top : cr.bottom) - br.top - tip.offsetHeight - 8;
+    tip.style.left = x + "px";
+    tip.style.top = Math.max(4, top) + "px";
+    Array.prototype.forEach.call(area.querySelectorAll(".h-col.on"), function (c) { c.classList.remove("on"); });
+    col.classList.add("on");
+  }
+  function hideTip() { tip.hidden = true; Array.prototype.forEach.call(area.querySelectorAll(".h-col.on"), function (c) { c.classList.remove("on"); }); }
+  area.addEventListener("mouseover", function (e) { var c = e.target.closest(".h-col"); if (c) showTip(c); });
+  area.addEventListener("mouseleave", hideTip);
+  area.addEventListener("focusin", function (e) { var c = e.target.closest(".h-col"); if (c) showTip(c); });
+  area.addEventListener("focusout", hideTip);
+  area.addEventListener("click", function (e) { var c = e.target.closest(".h-col"); if (c) showTip(c); });
+
+  var th = "<table><thead><tr><th>День</th>" + CORDER.map(function (c) { return "<th>" + CATS[c].name + "</th>"; }).join("") + "<th>Всего</th></tr></thead><tbody>";
+  days.forEach(function (o) {
+    var ks = Object.keys(o.v); if (!ks.length) return;
+    var bc = {}; ks.forEach(function (k) { var c = catOf(k); bc[c] = (bc[c] || 0) + o.v[k]; });
+    var tot = ks.reduce(function (s, k) { return s + o.v[k]; }, 0);
+    th += "<tr><td>" + o.dt.getUTCDate() + " " + MS[o.dt.getUTCMonth()] + "</td>" + CORDER.map(function (c) { return "<td>" + (bc[c] ? fh(bc[c]) : "") + "</td>"; }).join("") + "<td>" + fh(tot) + "</td></tr>";
+  });
+  $("htable").innerHTML = th + "</tbody></table>";
+
+  /* ---------- Языки ---------- */
+  var LMAX = LANGS[0][1];
+  $("langs").innerHTML = LANGS.map(function (l) {
+    return '<div class="lang"><div>' + esc(l[0]) + '<span class="who">' + esc(l[2]) + '</span></div><div class="bar"><i style="width:' + (l[1] / LMAX * 100).toFixed(2) + '%"></i></div><div class="v">' + fmt(l[1]) + "</div></div>";
+  }).join("");
+
+  /* ---------- Галерея: смена снимка по миниатюре ---------- */
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".gal-thumbs button");
+    if (!t) return;
+    var gal = t.closest(".gal"), items = G[gal.getAttribute("data-gal")], i = +t.getAttribute("data-t"), it = items[i];
+    var main = gal.querySelector(".shot.main"), img = main.querySelector("img");
+    main.setAttribute("data-i", i);
+    img.src = it.src; img.alt = it.cap; img.width = it.w; img.height = it.h;
+    gal.querySelector(".gal-cap").textContent = it.short;
+    Array.prototype.forEach.call(gal.querySelectorAll(".gal-thumbs button"), function (b) { b.setAttribute("aria-current", String(b === t)); });
+  });
+
+  /* ---------- Просмотр снимков и роликов ---------- */
+  var lb = $("lb"), stage = $("lbStage"), LB = { list: [], i: 0, from: null };
+  function renderLB() {
+    var it = LB.list[LB.i];
+    stage.innerHTML = it.type === "vid"
+      ? '<video controls playsinline preload="auto" poster="' + it.poster + '" src="' + it.src + '"></video>'
+      : '<img src="' + it.src + '" alt="' + esc(it.cap) + '" width="' + it.w + '" height="' + it.h + '">';
+    $("lbCap").textContent = it.cap;
+    $("lbCount").textContent = (LB.i + 1) + " / " + LB.list.length;
+    $("lbPrev").disabled = LB.i === 0;
+    $("lbNext").disabled = LB.i === LB.list.length - 1;
+    if (it.type === "vid") {
+      var v = stage.querySelector("video"), pr = v.play();
+      if (pr && pr.catch) pr.catch(function () {});
+    }
+  }
+  function openLB(list, i, from) {
+    LB.list = list; LB.i = i; LB.from = from;
+    lb.hidden = false;
+    document.documentElement.style.overflow = "hidden";
+    renderLB();
+    $("lbClose").focus();
+  }
+  function closeLB() {
+    stage.innerHTML = "";
+    lb.hidden = true;
+    document.documentElement.style.overflow = "";
+    if (LB.from && LB.from.focus) LB.from.focus();
+  }
+  function stepLB(n) {
+    var j = LB.i + n;
+    if (j < 0 || j >= LB.list.length) return;
+    LB.i = j; renderLB();
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-g]");
+    if (b) { openLB(G[b.getAttribute("data-g")], +b.getAttribute("data-i"), b); return; }
+    if (e.target === stage || e.target === lb) closeLB();
+  });
+  $("lbClose").addEventListener("click", closeLB);
+  $("lbPrev").addEventListener("click", function () { stepLB(-1); });
+  $("lbNext").addEventListener("click", function () { stepLB(1); });
+  document.addEventListener("keydown", function (e) {
+    if (lb.hidden) return;
+    if (e.key === "Escape") closeLB();
+    else if (e.key === "ArrowLeft") stepLB(-1);
+    else if (e.key === "ArrowRight") stepLB(1);
+  });
+
+  /* ---------- Переходы по странице ---------- */
+  var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function go(id) {
+    var el = $(id); if (!el) return;
+    el.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
+    if (el.classList.contains("prod")) {
+      el.classList.add("flash");
+      setTimeout(function () { el.classList.remove("flash"); }, 1400);
+    }
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href^="#"]'); if (!a) return;
+    var id = a.getAttribute("href").slice(1);
+    if (!$(id)) return;
+    e.preventDefault();
+    try { history.replaceState(null, "", "#" + id); } catch (err) {}
+    go(id);
+  });
+  window.addEventListener("hashchange", function () { var h = (location.hash || "").slice(1); if (h) go(h); });
+  if (location.hash) setTimeout(function () { go(location.hash.slice(1)); }, 80);
+})();
+</script>
+
+</html>
